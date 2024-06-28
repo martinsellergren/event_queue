@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:event_queue/event_queue.dart';
 import 'package:flutter/material.dart';
 
@@ -8,20 +7,19 @@ enum _EventType {
   event3,
 }
 
-class CustomPriorityBody extends StatefulWidget {
-  const CustomPriorityBody({super.key});
+class AsyncBody extends StatefulWidget {
+  const AsyncBody({super.key});
 
   @override
-  State<CustomPriorityBody> createState() => _CustomPriorityBodyState();
+  State<AsyncBody> createState() => _AsyncBodyState();
 }
 
-class _CustomPriorityBodyState extends State<CustomPriorityBody> {
-  final _queue = EventQueue<_EventType>(
-    // prioritize event3
-    queueTransformer: (queue) => [
-      ...queue.where((e) => e.eventId == _EventType.event3),
-      ...queue.whereNot((e) => e.eventId == _EventType.event3),
-    ],
+class _AsyncBodyState extends State<AsyncBody> {
+  final _queue = AsyncEventQueue<_EventType>(
+    // allow event2 and event3 to process concurrently
+    allowAsyncFor: (e1, e2) => [e1, e2].every(
+      (e) => e == _EventType.event2 || e == _EventType.event3,
+    ),
   );
 
   @override

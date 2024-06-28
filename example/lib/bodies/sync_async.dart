@@ -1,4 +1,4 @@
-import 'package:event_queue/sync_async_event_queue.dart';
+import 'package:event_queue/event_queue.dart';
 import 'package:flutter/material.dart';
 
 class SyncAsyncBody extends StatefulWidget {

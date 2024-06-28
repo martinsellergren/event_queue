@@ -1,13 +1,31 @@
 Event queues for queuing async tasks.
 
-Multiple variations of the queue:
-- Droppable
+##  Features
+
+- `EventQueue.sequential()`
+  - Next event starts when previous one completes.
+- `EventQueue.droppable()`
   - Discard events during processing current event.
-- SingleElement
-  - Queue holds max 1 element. So, if e.g three events are incoming during processing of current event, only the last one of the three is precessed after current event, the rest are discarded.
-- Hybrid
-  - Events are processed sequentially by default. But you may allow certain events to process concurrently by adding an `eventId` to each event and make use of the parameter `allowAsyncFor`.
-- SyncAsync
-  - A convenience wrapper around Hybrid when you want to add either in-sync or async elements (no need for adding ids manually).
-- Custom queue, event priority, etc
-  - You may pass a queueTransformer as a parameter to the queue to transform the queue however you like (not for Hybrid version though). The transformation is run after an event completes. You may use it e.g to change order of the queued events (prioritize some event id).
+- `EventQueue.singleElement()`
+  - Queue holds max 1 element (event). So, if e.g three events are incoming during processing of current event, only the last one of the three is processed after current event, the rest are discarded.
+- Custom `EventQueue()`, for event priority, etc
+  - Using the default constructor, events are processed sequentially but you pass a queueTransformer as constructor parameter to transform the queue however you like. The transformation is run after an event completes before determining next event. You may use it e.g to change order of the queued events (prioritize some event id) or filter out certain events.
+- `AsyncEventQueue()` (concurrent processing)
+  - Events are processed in-sync (sequentially) by default but you may allow certain events to process async (concurrently) by adding an id to each event and make use of the parameter `allowAsyncFor`.
+- `SyncAsyncEventQueue()`
+  - A convenience wrapper around AsyncEventQueue for when you want to add either in-sync or async elements (no need to deal with ids).
+
+## Basic usage
+
+```dart
+final _queue = EventQueue.sequential();
+
+TextButton(
+  onPressed: () => _queue(() async {
+    print('fire0');
+    await Future.delayed(const Duration(seconds: 1));
+    print('fire1');
+  }),
+  child: const Text('Fire'),
+)
+```
