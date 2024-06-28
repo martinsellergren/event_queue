@@ -1,3 +1,7 @@
+## 0.1.3
+
+* Minor fix.
+
 ## 0.1.2
 
 * Rename SyncAsyncEventQueue to ReadWriteEventQueue.
