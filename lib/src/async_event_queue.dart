@@ -33,7 +33,12 @@ class AsyncEventQueue<Id> {
     _active.add(next);
     _step();
     final (:event, eventId: _, :completer) = next;
-    completer.complete(await event());
+    try {
+      final res = await event();
+      completer.complete(res);
+    } catch (e, s) {
+      completer.completeError(e, s);
+    }
     _active.remove(next);
     _step();
   }

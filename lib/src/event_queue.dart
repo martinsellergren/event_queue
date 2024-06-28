@@ -45,7 +45,12 @@ class EventQueue<Id> {
     if (_queue.isEmpty || _isProcessing || !mounted) return;
     final (:event, eventId: _, :completer) = _queue.removeAt(0);
     _isProcessing = true;
-    completer.complete(await event());
+    try {
+      final res = await event();
+      completer.complete(res);
+    } catch (e, s) {
+      completer.completeError(e, s);
+    }
     _isProcessing = false;
     transform(queueTransformer);
     _step();

@@ -1,3 +1,7 @@
+## 0.1.5
+
+* Make event errors catchable.
+
 ## 0.1.4
 
 * Clean up ReadWriteEventQueue.
