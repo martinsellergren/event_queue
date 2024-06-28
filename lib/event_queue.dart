@@ -4,34 +4,29 @@ import 'package:collection/collection.dart';
 
 typedef EventQueueCallback<T> = Future<T?> Function();
 
-typedef QueueTransformer<Id> = bool Function(Id? id, int i, int n);
+typedef QueueTransformer<Id> = List<Event<Id>> Function(List<Event<Id>> queue);
 
-typedef _Event<Id> = (
-  EventQueueCallback callback,
+typedef Event<Id> = ({
+  EventQueueCallback event,
   Id? eventId,
   Completer completer
-);
+});
 
 class EventQueue<Id> {
-  List<_Event<Id>> _queue = [];
+  List<Event<Id>> _queue = [];
   bool _isProcessing = false;
   bool mounted = true;
 
   final QueueTransformer<Id> queueTransformer;
-  final bool Function(Id e1, Id e2)? allowAsyncFor;
 
   EventQueue({
     required this.queueTransformer,
-    this.allowAsyncFor,
   });
 
   EventQueue.singleElement()
-      : allowAsyncFor = null,
-        queueTransformer = ((id, i, n) => i == n - 1);
+      : queueTransformer = ((queue) => queue.isEmpty ? [] : [queue.last]);
 
-  EventQueue.droppable()
-      : allowAsyncFor = null,
-        queueTransformer = ((id, i, n) => false);
+  EventQueue.droppable() : queueTransformer = ((queue) => []);
 
   void dispose() {
     mounted = false;
@@ -41,14 +36,14 @@ class EventQueue<Id> {
 
   Future<T> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
     final completer = Completer();
-    _queue.add((event, eventId, completer));
+    _queue.add((event: event, eventId: eventId, completer: completer));
     _step();
     return await completer.future;
   }
 
   void _step() async {
     if (_queue.isEmpty || _isProcessing || !mounted) return;
-    final (event, _, completer) = _queue.removeAt(0);
+    final (:event, eventId: _, :completer) = _queue.removeAt(0);
     _isProcessing = true;
     completer.complete(await event());
     _isProcessing = false;
@@ -57,9 +52,7 @@ class EventQueue<Id> {
   }
 
   void transform(QueueTransformer<Id> transformer) {
-    _queue = _queue
-        .whereIndexed((i, e) => transformer(e.$2, i, _queue.length))
-        .toList();
+    _queue = transformer(_queue);
   }
 
   void clear() {
@@ -68,8 +61,8 @@ class EventQueue<Id> {
 }
 
 class SequentialEventQueue<Id> {
-  List<_Event<Id>> _queue = [];
-  final List<_Event<Id>> _active = [];
+  List<Event<Id>> _queue = [];
+  final List<Event<Id>> _active = [];
   bool mounted = true;
 
   final bool Function(Id e1, Id e2)? allowAsyncFor;
@@ -86,7 +79,7 @@ class SequentialEventQueue<Id> {
 
   Future<T> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
     final completer = Completer();
-    _queue.add((event, eventId, completer));
+    _queue.add((event: event, eventId: eventId, completer: completer));
     _step();
     return await completer.future;
   }
@@ -97,31 +90,29 @@ class SequentialEventQueue<Id> {
     _queue.remove(next);
     _active.add(next);
     _step();
-    final (event, _, completer) = next;
+    final (:event, eventId: _, :completer) = next;
     completer.complete(await event());
     _active.remove(next);
     _step();
   }
 
-  _Event<Id>? _upNext() {
+  Event<Id>? _upNext() {
     final next = _queue.firstOrNull;
     if (next == null) return null;
     final allowAsyncFor = this.allowAsyncFor;
     if (allowAsyncFor == null) return _active.isEmpty ? next : null;
     final allowNext = _active.every((e) =>
-        e.$2 != null &&
-        next.$2 != null &&
+        e.eventId != null &&
+        next.eventId != null &&
         allowAsyncFor(
-          e.$2 as Id,
-          next.$2 as Id,
+          e.eventId as Id,
+          next.eventId as Id,
         ));
     return allowNext ? next : null;
   }
 
   void transform(QueueTransformer<Id> transformer) {
-    _queue = _queue
-        .whereIndexed((i, e) => transformer(e.$2, i, _queue.length))
-        .toList();
+    _queue = transformer(_queue);
   }
 
   void clear() {
