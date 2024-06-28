@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Make SyncAsyncEventQueue's event type public.
+
 ## 0.1.0
 
 * Add SyncAsyncEventQueue.
