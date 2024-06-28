@@ -8,29 +8,30 @@ enum ReadWriteEvent {
 }
 
 /// Sequential reads are allowed to be async.
-class ReadWriteEventQueue extends AsyncEventQueue<ReadWriteEvent> {
-  ReadWriteEventQueue()
-      : super(
-          allowAsyncFor: (e1, e2) =>
-              e1 == ReadWriteEvent.read && e2 == ReadWriteEvent.read,
-        );
+class ReadWriteEventQueue {
+  final _queue = AsyncEventQueue<ReadWriteEvent>(
+    allowAsyncFor: (e1, e2) =>
+        e1 == ReadWriteEvent.read && e2 == ReadWriteEvent.read,
+  );
 
-  @override
-  // ignore: library_private_types_in_public_api
-  Future<T> call<T>(EventQueueCallback<T> event, {ReadWriteEvent? eventId}) {
-    return super.call(event, eventId: eventId);
+  void dispose() {
+    _queue.dispose();
   }
 
   Future<T> read<T>(EventQueueCallback<T> event) {
-    return call(event, eventId: ReadWriteEvent.read);
+    return _queue(event, eventId: ReadWriteEvent.read);
   }
 
   Future<T> write<T>(EventQueueCallback<T> event) {
-    return call(event, eventId: ReadWriteEvent.write);
+    return _queue(event, eventId: ReadWriteEvent.write);
   }
 
   void clearWrites() {
-    transform((queue) =>
+    _queue.transform((queue) =>
         queue.where((e) => e.eventId != ReadWriteEvent.write).toList());
+  }
+
+  void clear() {
+    _queue.clear();
   }
 }
