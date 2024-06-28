@@ -1,9 +1,9 @@
 import 'package:event_queue_example/bodies/async.dart';
 import 'package:event_queue_example/bodies/custom_priority.dart';
 import 'package:event_queue_example/bodies/droppable.dart';
+import 'package:event_queue_example/bodies/read_write.dart';
 import 'package:event_queue_example/bodies/sequential.dart';
 import 'package:event_queue_example/bodies/single_element.dart';
-import 'package:event_queue_example/bodies/sync_async.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +16,7 @@ enum CaseStudy {
   singleElement,
   customPriority,
   async,
-  syncAsync,
+  readWrite,
 }
 
 class _Page extends StatelessWidget {
@@ -41,7 +41,7 @@ class _Page extends StatelessWidget {
                     CaseStudy.singleElement => const SingleElementBody(),
                     CaseStudy.customPriority => const CustomPriorityBody(),
                     CaseStudy.async => const AsyncBody(),
-                    CaseStudy.syncAsync => const SyncAsyncBody(),
+                    CaseStudy.readWrite => const ReadWriteBody(),
                   })
               .toList(),
         ),

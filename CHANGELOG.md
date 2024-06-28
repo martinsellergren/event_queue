@@ -1,3 +1,7 @@
+## 0.1.2
+
+* Rename SyncAsyncEventQueue to ReadWriteEventQueue.
+
 ## 0.1.1
 
 * Make SyncAsyncEventQueue's event type public.

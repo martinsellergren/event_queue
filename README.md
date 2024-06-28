@@ -12,8 +12,8 @@ Event queues for queuing async tasks.
   - Using the default constructor, events are processed sequentially but you pass a queueTransformer as constructor parameter to transform the queue however you like. The transformation is run after an event completes before determining next event. You may use it e.g to change order of the queued events (prioritize some event id) or filter out certain events.
 - `AsyncEventQueue()` (concurrent processing)
   - Events are processed in-sync (sequentially) by default but you may allow certain events to process async (concurrently) by adding an id to each event and make use of the parameter `allowAsyncFor`.
-- `SyncAsyncEventQueue()`
-  - A convenience wrapper around AsyncEventQueue for when you want to add either in-sync or async elements (no need to deal with ids).
+- `ReadWriteEventQueue()`
+  - A convenience wrapper around AsyncEventQueue for when you have read and writes operations, and want read operations to happen concurrently and write operations sequentially (i.e sequentially with both read and other write operations).
 
 ## Basic usage
 
