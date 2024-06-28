@@ -1,6 +1,6 @@
 name: event_queue
-description: "Event queue for queuing async tasks."
-version: 0.0.1
+description: "Event queues for queuing async tasks."
+version: 0.1.0
 repository: https://github.com/martinsellergren/event_queue
 
 environment:
