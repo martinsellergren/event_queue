@@ -1,6 +1,6 @@
 import 'dart:async';
 
-typedef EventQueueCallback<T> = Future<T?> Function();
+typedef EventQueueCallback<T> = Future<T> Function();
 
 typedef QueueTransformer<Id> = List<Event<Id>> Function(List<Event<Id>> queue);
 

@@ -1,3 +1,7 @@
+## 0.1.6
+
+* Fix nullability bug of EventQueueCallback.
+
 ## 0.1.5
 
 * Make event errors catchable.
