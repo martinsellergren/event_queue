@@ -1,3 +1,7 @@
+## 0.1.7
+
+* Add isCleared flag.
+
 ## 0.1.6
 
 * Fix nullability bug of EventQueueCallback.

@@ -24,6 +24,8 @@ TextButton(
   onPressed: () => _queue(() async {
     print('fire0');
     await Future.delayed(const Duration(seconds: 1));
+    if (!_queue.isEmpty) return; // If you need to cancel if new items are in the pipeline.
+    if (_queue.isCleared) return; // If you need to cancel if the queue was clear()'d.
     print('fire1');
   }),
   child: const Text('Fire'),

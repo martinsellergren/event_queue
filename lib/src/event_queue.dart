@@ -13,6 +13,7 @@ typedef Event<Id> = ({
 class EventQueue<Id> {
   List<Event<Id>> _queue = [];
   bool _isProcessing = false;
+  bool _isCleared = false;
   bool mounted = true;
 
   final QueueTransformer<Id> queueTransformer;
@@ -34,6 +35,12 @@ class EventQueue<Id> {
 
   bool get isEmpty => _queue.isEmpty;
 
+  /// Set to true when calling clear().
+  /// Set to false again when a new event is processed.
+  /// Use it if you need to cancel any currently processing work, in addition to
+  /// clearing the upcoming items.
+  bool get isCleared => _isCleared;
+
   Future<T> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
     final completer = Completer();
     _queue.add((event: event, eventId: eventId, completer: completer));
@@ -45,6 +52,7 @@ class EventQueue<Id> {
     if (_queue.isEmpty || _isProcessing || !mounted) return;
     final (:event, eventId: _, :completer) = _queue.removeAt(0);
     _isProcessing = true;
+    _isCleared = false;
     try {
       final res = await event();
       completer.complete(res);
@@ -62,5 +70,6 @@ class EventQueue<Id> {
 
   void clear() {
     _queue.clear();
+    _isCleared = true;
   }
 }

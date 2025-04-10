@@ -39,6 +39,7 @@ class _SequentialBodyState extends State<SequentialBody> {
   void _fire() => _queue(() async {
         print('fire0');
         await Future.delayed(const Duration(seconds: 1));
+        if (_queue.isCleared) return;
         print('fire1');
       });
 }
