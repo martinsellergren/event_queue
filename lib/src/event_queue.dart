@@ -53,19 +53,31 @@ class EventQueue<Id> {
     final (:event, eventId: _, :completer) = _queue.removeAt(0);
     _isProcessing = true;
     _isCleared = false;
+    Function(Completer completer) completeCompleter;
     try {
       final res = await event();
-      completer.complete(res);
+      completeCompleter = (completer) => completer.complete(res);
     } catch (e, s) {
-      completer.completeError(e, s);
+      completeCompleter = (completer) => completer.completeError(e, s);
     }
+    completeCompleter(completer);
     _isProcessing = false;
-    transform(queueTransformer);
+    _transform(
+      transformer: queueTransformer,
+      completeDiscardedCompleter: completeCompleter,
+    );
     _step();
   }
 
-  void transform(QueueTransformer<Id> transformer) {
+  void _transform(
+      {required QueueTransformer<Id> transformer,
+      required Function(Completer completer) completeDiscardedCompleter}) {
+    final queue0 = _queue.toList();
     _queue = transformer(_queue);
+    queue0
+        .toSet()
+        .difference(_queue.toSet())
+        .forEach((e) => completeDiscardedCompleter(e.completer));
   }
 
   void clear() {

@@ -24,7 +24,14 @@ class _SingleElementBodyState extends State<SingleElementBody> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextButton(
-            onPressed: _fire,
+            onPressed: () async {
+              try {
+                final res = await _fire();
+                print('res: $res');
+              } catch (e) {
+                print('res: $e');
+              }
+            },
             child: const Text('Fire'),
           ),
         ],
@@ -32,10 +39,11 @@ class _SingleElementBodyState extends State<SingleElementBody> {
     );
   }
 
-  void _fire() => _queue(() async {
+  Future<int> _fire() => _queue(() async {
         print('fire0');
         await Future.delayed(const Duration(seconds: 1));
-        if (!_queue.isEmpty) return;
+        if (!_queue.isEmpty) throw 'discarded';
         print('fire1');
+        return 101;
       });
 }

@@ -24,7 +24,10 @@ class _DroppableBodyState extends State<DroppableBody> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextButton(
-            onPressed: _fire,
+            onPressed: () async {
+              final res = await _fire();
+              print('res: $res');
+            },
             child: const Text('Fire'),
           ),
         ],
@@ -32,9 +35,10 @@ class _DroppableBodyState extends State<DroppableBody> {
     );
   }
 
-  void _fire() => _queue(() async {
+  Future<int> _fire() => _queue(() async {
         print('fire0');
         await Future.delayed(const Duration(seconds: 1));
         print('fire1');
+        return 101;
       });
 }

@@ -1,3 +1,9 @@
+## 0.2.0
+
+* Make transform private, and always complete completers.
+
+Before, a discarded event's completer would never finish. Now they finish with same result as the last completed event.
+
 ## 0.1.7
 
 * Add isCleared flag.
