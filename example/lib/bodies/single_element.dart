@@ -39,7 +39,7 @@ class _SingleElementBodyState extends State<SingleElementBody> {
     );
   }
 
-  Future<int> _fire() => _queue(() async {
+  Future<int?> _fire() => _queue(() async {
         print('fire0');
         await Future.delayed(const Duration(seconds: 1));
         if (!_queue.isEmpty) throw 'discarded';

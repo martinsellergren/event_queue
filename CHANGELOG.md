@@ -1,3 +1,7 @@
+## 0.3.0
+
+* Events return null if discarded/cleared/!mounted
+
 ## 0.2.0
 
 * Make transform private, and always complete completers.

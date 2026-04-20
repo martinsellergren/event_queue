@@ -35,7 +35,7 @@ class _DroppableBodyState extends State<DroppableBody> {
     );
   }
 
-  Future<int> _fire() => _queue(() async {
+  Future<int?> _fire() => _queue(() async {
         print('fire0');
         await Future.delayed(const Duration(seconds: 1));
         print('fire1');

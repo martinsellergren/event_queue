@@ -15,12 +15,14 @@ class AsyncEventQueue<Id> {
 
   void dispose() {
     mounted = false;
+    clear();
   }
 
   bool get isEmpty => _queue.isEmpty;
 
-  Future<T> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
-    final completer = Completer();
+  Future<T?> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
+    if (!mounted) return null;
+    final completer = Completer<T>();
     _queue.add((event: event, eventId: eventId, completer: completer));
     _step();
     return await completer.future;
@@ -28,7 +30,7 @@ class AsyncEventQueue<Id> {
 
   void _step() async {
     final next = _upNext();
-    if (next == null || !mounted) return;
+    if (next == null) return;
     _queue.remove(next);
     _active.add(next);
     _step();
@@ -59,10 +61,15 @@ class AsyncEventQueue<Id> {
   }
 
   void transform(QueueTransformer<Id> transformer) {
+    final queue0 = _queue.toList();
     _queue = transformer(_queue);
+    queue0
+        .toSet()
+        .difference(_queue.toSet())
+        .forEach((e) => e.completer.complete(null));
   }
 
   void clear() {
-    _queue.clear();
+    transform((queue) => []);
   }
 }

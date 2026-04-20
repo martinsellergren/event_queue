@@ -31,6 +31,7 @@ class EventQueue<Id> {
 
   void dispose() {
     mounted = false;
+    clear();
   }
 
   bool get isEmpty => _queue.isEmpty;
@@ -41,47 +42,41 @@ class EventQueue<Id> {
   /// clearing the upcoming items.
   bool get isCleared => _isCleared;
 
-  Future<T> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
-    final completer = Completer();
+  Future<T?> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
+    if (!mounted) return null;
+    final completer = Completer<T?>();
     _queue.add((event: event, eventId: eventId, completer: completer));
     _step();
     return await completer.future;
   }
 
   void _step() async {
-    if (_queue.isEmpty || _isProcessing || !mounted) return;
+    if (_queue.isEmpty || _isProcessing) return;
     final (:event, eventId: _, :completer) = _queue.removeAt(0);
     _isProcessing = true;
     _isCleared = false;
-    Function(Completer completer) completeCompleter;
     try {
       final res = await event();
-      completeCompleter = (completer) => completer.complete(res);
+      completer.complete(res);
     } catch (e, s) {
-      completeCompleter = (completer) => completer.completeError(e, s);
+      completer.completeError(e, s);
     }
-    completeCompleter(completer);
     _isProcessing = false;
-    _transform(
-      transformer: queueTransformer,
-      completeDiscardedCompleter: completeCompleter,
-    );
+    transform(queueTransformer);
     _step();
   }
 
-  void _transform(
-      {required QueueTransformer<Id> transformer,
-      required Function(Completer completer) completeDiscardedCompleter}) {
+  void transform(QueueTransformer<Id> transformer) {
     final queue0 = _queue.toList();
     _queue = transformer(_queue);
     queue0
         .toSet()
         .difference(_queue.toSet())
-        .forEach((e) => completeDiscardedCompleter(e.completer));
+        .forEach((e) => e.completer.complete(null));
   }
 
   void clear() {
-    _queue.clear();
+    transform((queue) => []);
     _isCleared = true;
   }
 }
