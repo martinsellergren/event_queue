@@ -25,12 +25,6 @@ class _CustomPriorityBodyState extends State<CustomPriorityBody> {
   );
 
   @override
-  void dispose() {
-    _queue.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(

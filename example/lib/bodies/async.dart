@@ -23,12 +23,6 @@ class _AsyncBodyState extends State<AsyncBody> {
   );
 
   @override
-  void dispose() {
-    _queue.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(

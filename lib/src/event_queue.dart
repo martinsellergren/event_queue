@@ -14,7 +14,6 @@ class EventQueue<Id> {
   List<Event<Id>> _queue = [];
   bool _isProcessing = false;
   bool _isCleared = false;
-  bool mounted = true;
 
   final QueueTransformer<Id> queueTransformer;
 
@@ -29,11 +28,6 @@ class EventQueue<Id> {
 
   EventQueue.sequential() : queueTransformer = ((queue) => queue);
 
-  void dispose() {
-    mounted = false;
-    clear();
-  }
-
   bool get isEmpty => _queue.isEmpty;
 
   /// Set to true when calling clear().
@@ -43,7 +37,6 @@ class EventQueue<Id> {
   bool get isCleared => _isCleared;
 
   Future<T?> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
-    if (!mounted) return null;
     final completer = Completer<T?>();
     _queue.add((event: event, eventId: eventId, completer: completer));
     _step();
@@ -81,7 +74,7 @@ class EventQueue<Id> {
   }
 }
 
-/// A sequential queue that never is transformed/disposed can skip null return.
+/// A sequential queue that never is transformed can skip null return.
 class SequentialQueue {
   final _queue = EventQueue.sequential();
   Future<T> call<T>(EventQueueCallback<T> event) async =>

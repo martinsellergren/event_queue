@@ -12,12 +12,6 @@ class _SingleElementBodyState extends State<SingleElementBody> {
   final _queue = EventQueue.singleElement();
 
   @override
-  void dispose() {
-    _queue.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(

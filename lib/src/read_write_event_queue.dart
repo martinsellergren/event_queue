@@ -14,10 +14,6 @@ class ReadWriteEventQueue {
         e1 == _ReadWriteEvent.read && e2 == _ReadWriteEvent.read,
   );
 
-  void dispose() {
-    _queue.dispose();
-  }
-
   Future<T?> read<T>(EventQueueCallback<T> event) {
     return _queue(event, eventId: _ReadWriteEvent.read);
   }

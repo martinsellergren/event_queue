@@ -5,7 +5,6 @@ import 'package:event_queue/src/event_queue.dart';
 class AsyncEventQueue<Id> {
   List<Event<Id>> _queue = [];
   final List<Event<Id>> _active = [];
-  bool mounted = true;
 
   final bool Function(Id e1, Id e2)? allowAsyncFor;
 
@@ -13,15 +12,9 @@ class AsyncEventQueue<Id> {
     this.allowAsyncFor,
   });
 
-  void dispose() {
-    mounted = false;
-    clear();
-  }
-
   bool get isEmpty => _queue.isEmpty;
 
   Future<T?> call<T>(EventQueueCallback<T> event, {Id? eventId}) async {
-    if (!mounted) return null;
     final completer = Completer<T>();
     _queue.add((event: event, eventId: eventId, completer: completer));
     _step();

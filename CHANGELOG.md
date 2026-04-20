@@ -1,3 +1,7 @@
+## 0.4.0
+
+* Remove dispose()
+
 ## 0.3.1
 
 * Add SequentialQueue
