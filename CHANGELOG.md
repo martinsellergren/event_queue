@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Add SequentialQueue
+
 ## 0.3.0
 
 * Events return null if discarded/cleared/!mounted

@@ -80,3 +80,10 @@ class EventQueue<Id> {
     _isCleared = true;
   }
 }
+
+/// A sequential queue that never is transformed/disposed can skip null return.
+class SequentialQueue {
+  final _queue = EventQueue.sequential();
+  Future<T> call<T>(EventQueueCallback<T> event) async =>
+      (await _queue(event)) as T;
+}
